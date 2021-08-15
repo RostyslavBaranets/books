@@ -10,10 +10,10 @@ Route::get('/books', function () {
     return view('books');
 })->name('books');
 
-Route::get('/authors','App\Http\Controllers\AddauthorController@allauthors')->name('authors');
+Route::get('/authors', function () {
+    return view('authors');
+})->name('authors');
 
-Route::get('/addauthor', function () {
-    return view('addauthor');
-})->name('add-author');
+Route::get('/allauthors','App\Http\Controllers\AddauthorController@allauthors')->name('allauthors');
 
 Route::post('/addauthor/save', 'App\Http\Controllers\AddauthorController@save')->name('author-save');
