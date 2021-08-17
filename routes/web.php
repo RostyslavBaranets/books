@@ -1,19 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AddauthorController;
 
 Route::get('/', function () {
-    return view('home');
+  return view('home');
 })->name('home');
 
 Route::get('/books', function () {
-    return view('books');
+  return view('books');
 })->name('books');
 
-Route::get('/authors', function () {
-    return view('authors');
-})->name('authors');
+Route::get('/authors',[AddauthorController::class, 'index'])->name('authors');
 
-Route::get('/allauthors','App\Http\Controllers\AddauthorController@allauthors')->name('allauthors');
-
-Route::post('/addauthor/save', 'App\Http\Controllers\AddauthorController@save')->name('author-save');
+Route::get('fetch-authors', [AddauthorController::class, 'fetchauthors']);
+Route::post('store-authors', [AddauthorController::class, 'store']);
+Route::get('edit-author/{id}', [AddauthorController::class, 'edit']);
+Route::put('update-author/{id}', [AddauthorController::class, 'update']);
+Route::delete('delete-author/{id}', [AddauthorController::class, 'destroy']);

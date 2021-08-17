@@ -4,36 +4,129 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\author;
-use DataTables;
+use Illuminate\Support\Facades\Validator;
 
 class AddauthorController extends Controller
 {
-    public function save(Request $req){
-      $validator = \Validator::make($req->all(),[
-        'name'=>'required',
-        'surname'=>'required|min:3',
-      ]);
 
-      if(!$validator->passes()){
-       return response()->json(['code'=>0,'error'=>$validator->errors()->toArray()]);
-      }else{
-        $author = new author;
-        $author->name = $req->input('name');
-        $author->surname = $req->input('surname');
-        $author->patronymic = $req->input('patronymic');
-        $query = $author->save();
-        if(!$query){
-          return response()->json(['code'=>0,'msg'=>'Something went wrong']);
-        }else{
-          return response()->json(['code'=>1,'msg'=>'New author has been successfully saved']);
-        }
+  public function index()
+  {
+    $authors = author::paginate(5);
+    return view('authors');
+  }
+
+  public function fetchauthors()
+  {
+    $authors = author::all();
+    return response()->json([
+      'authors'=>$authors,
+    ]);
+  }
+
+  public function store(Request $request)
+  {
+    $validator = Validator::make($request->all(), [
+      'name'=> 'required',
+      'surname'=>'required|min:3',
+    ]);
+
+    if($validator->fails())
+    {
+      return response()->json([
+        'status'=>400,
+        'errors'=>$validator->messages()
+      ]);
+    }
+    else
+    {
+      $author = new author;
+      $author->name = $request->input('name');
+      $author->surname = $request->input('surname');
+      $author->patronymic = $request->input('patronymic');
+      $author->save();
+      return response()->json([
+        'status'=>200,
+        'message'=>'Author Added Successfully.'
+      ]);
+    }
+  }
+
+  public function edit($id)
+  {
+    $author = author::find($id);
+    if($author)
+    {
+      return response()->json([
+        'status'=>200,
+        'author'=> $author,
+      ]);
+    }
+    else
+    {
+      return response()->json([
+        'status'=>404,
+        'message'=>'No Author Found.'
+      ]);
+    }
+
+  }
+
+  public function update(Request $request, $id)
+  {
+    $validator = Validator::make($request->all(), [
+      'name'=> 'required',
+      'surname'=>'required|min:3',
+    ]);
+
+    if($validator->fails())
+    {
+      return response()->json([
+        'status'=>400,
+        'errors'=>$validator->messages()
+      ]);
+    }
+    else
+    {
+      $author = author::find($id);
+      if($author)
+      {
+        $author->name = $request->input('name');
+        $author->surname = $request->input('surname');
+        $author->patronymic = $request->input('patronymic');
+        $author->update();
+        return response()->json([
+          'status'=>200,
+          'message'=>'Author Updated Successfully.'
+        ]);
+      }
+      else
+      {
+        return response()->json([
+          'status'=>404,
+          'message'=>'No Author Found.'
+        ]);
       }
     }
+  }
 
-    public function allauthors(Request $req){
-      $author = author::all();
-      return response()->json(['authors'=>$author]);
-
+  public function destroy($id)
+  {
+    $author = author::find($id);
+    if($author)
+    {
+      $author->delete();
+      return response()->json([
+        'status'=>200,
+        'message'=>'Author Deleted Successfully.'
+      ]);
     }
+    else
+    {
+      return response()->json([
+        'status'=>404,
+        'message'=>'No Author Found.'
+      ]);
+    }
+  }
 
 }
