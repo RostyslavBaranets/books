@@ -11,8 +11,10 @@ class AddauthorController extends Controller
 
   public function index()
   {
-    $authors = author::paginate(5);
-    return view('authors');
+    $authors = author::all();
+        return view('authors', compact('authors'));
+  //  $authors = author::all();
+  //  return view('authors');
   }
 
   public function fetchauthors()

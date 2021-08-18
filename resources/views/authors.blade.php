@@ -102,9 +102,20 @@ authors
               </tr>
             </thead>
             <tbody>
-
+              @foreach ($authors as $data)
+              <tr id="uid{{ $data->id  }}">
+                <td>{{ $data->id  }}</td>
+                <td>{{ $data->name  }}</td>
+                <td>{{ $data->surname  }}</td>
+                <td>{{ $data->patronymic  }}</td>
+                <td><button type="button" value=" {{ $data->id  }} " class="btn btn-primary editbtn btn-sm">Edit</button></td>\
+                <td><button type="button" value=" {{ $data->id  }} " class="btn btn-danger deletebtn btn-sm">Delete</button></td>\
+              </tr>
+              @endforeach
             </tbody>
           </table>
+
+          {{ $authors->links() }}
         </div>
       </div>
     </div>
@@ -112,29 +123,29 @@ authors
 </div>
 
 <div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Delete Author</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <h4>Confirm to Delete ?</h4>
-                <input type="hidden" id="deleteing_id">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary delete_author">Yes Delete</button>
-            </div>
-        </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Author</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h4>Confirm to Delete ?</h4>
+        <input type="hidden" id="deleteing_id">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary delete_author">Yes Delete</button>
+      </div>
     </div>
+  </div>
 </div>
 @endsection
 
 @section('script')
 <script>
 $(document).ready(function(){
-  fetchauthors();
+  //fetchauthors();
 
   function fetchauthors() {
     $.ajax({
@@ -259,43 +270,43 @@ $(document).ready(function(){
   });
 
   $(document).on('click', '.deletebtn', function () {
-             var author_id = $(this).val();
-             $('#DeleteModal').modal('show');
-             $('#deleteing_id').val(author_id);
-         });
+    var author_id = $(this).val();
+    $('#DeleteModal').modal('show');
+    $('#deleteing_id').val(author_id);
+  });
 
-         $(document).on('click', '.delete_author', function (e) {
-             e.preventDefault();
+  $(document).on('click', '.delete_author', function (e) {
+    e.preventDefault();
 
-             $(this).text('Deleting..');
-             var id = $('#deleteing_id').val();
+    $(this).text('Deleting..');
+    var id = $('#deleteing_id').val();
 
-             $.ajaxSetup({
-                 headers: {
-                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                 }
-             });
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
 
-             $.ajax({
-                 type: "DELETE",
-                 url: "/delete-author/" + id,
-                 dataType: "json",
-                 success: function (response) {
-                     if (response.status == 404) {
-                         $('#success_message').addClass('alert alert-success');
-                         $('#success_message').text(response.message);
-                         $('.delete_author').text('Yes Delete');
-                     } else {
-                         $('#success_message').html("");
-                         $('#success_message').addClass('alert alert-success');
-                         $('#success_message').text(response.message);
-                         $('.delete_author').text('Yes Delete');
-                         $('#DeleteModal').modal('hide');
-                         fetchauthors();
-                     }
-                 }
-             });
-         });
+    $.ajax({
+      type: "DELETE",
+      url: "/delete-author/" + id,
+      dataType: "json",
+      success: function (response) {
+        if (response.status == 404) {
+          $('#success_message').addClass('alert alert-success');
+          $('#success_message').text(response.message);
+          $('.delete_author').text('Yes Delete');
+        } else {
+          $('#success_message').html("");
+          $('#success_message').addClass('alert alert-success');
+          $('#success_message').text(response.message);
+          $('.delete_author').text('Yes Delete');
+          $('#DeleteModal').modal('hide');
+          fetchauthors();
+        }
+      }
+    });
+  });
 
 });
 
